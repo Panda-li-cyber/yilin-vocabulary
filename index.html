@@ -106,17 +106,14 @@
     let qIdx = 0;
     let audioContextUnlocked = false;
 
-    // 处理浏览器音频限制：第一次点击页面激活音频
     function handleFirstClick() {
         if (!audioContextUnlocked) {
             const context = new (window.AudioContext || window.webkitAudioContext)();
-            context.resume();
+            if(context.state === 'suspended') context.resume();
             audioContextUnlocked = true;
-            console.log("音频上下文已激活");
         }
     }
 
-    // 单元标签美化
     function formatUnitLabel(u) {
         if(!u) return "";
         const code = u.toString().toLowerCase();
@@ -127,19 +124,16 @@
         return u;
     }
 
-    // 页面初始化：直接从 data.js 加载
     window.onload = function() {
+        // 确保匹配变量名 vocabData (Data.js 内部必须定义为 const vocabData = ...)
         if (typeof vocabData !== 'undefined') {
-            // 预处理小写匹配
             vocabData.forEach(item => { if(item.单元) item.单元 = item.单元.toString().toLowerCase(); });
-            
             setupUnitDropdown();
             document.getElementById('main-header').style.display = 'block';
-            
             const firstUnit = [...new Set(vocabData.map(i => i.单元))].sort()[0];
             selectUnit(firstUnit);
         } else {
-            alert("错误：未找到 data.js 文件，请确保它与 index.html 在同一文件夹下。");
+            alert("错误：未找到词汇数据。请确保 Data.js 文件内容正确，且包含 const vocabData = [...]");
         }
     };
 
@@ -261,5 +255,4 @@
     }
 </script>
 </body>
-
 </html>
